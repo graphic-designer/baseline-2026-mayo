@@ -1,0 +1,122 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="description" content="Ejemplo botón 2.5D y ventana modal dinámica y elástica. Baseline 2026 Mayo (06/05/2026)">
+<meta name="author" content="Ignacio Llorente Fernández de la Reguera">
+ <title>Baseline 2026 Mayo</title>
+    <style>
+        @layer motor, base, componentes;
+
+        @layer motor {
+            @property --angle { syntax: '<angle>'; inherits: false; initial-value: 0deg; }
+
+            :root {
+                color-scheme: light dark;
+                --brand-color: oklch(0.55 0.2 250); 
+                --bg-page: light-dark(oklch(1 0 0), oklch(0.25 0.01 240)); 
+                --bg-modal: light-dark(oklch(1 0 0), oklch(0.12 0.02 240));                 
+                --btn-color: light-dark(var(--brand-color), oklch(0.1 0 0));
+                --btn-text: oklch(1 0 0);             
+                --btn-shadow: light-dark(oklch(0.4 0.2 250), oklch(0 0 0));               
+                --text-ui: light-dark(oklch(0 0 0), oklch(0.95 0 0));
+                --title-modal: light-dark(var(--brand-color), oklch(1 0 0));
+                --close-bg: var(--brand-color);
+                --close-icon: oklch(1 0 0);
+            }
+          .u-dark-mode { --brand-color: oklch(10% 0.01 240); }
+        }
+
+        @layer base {
+            body {
+                font-family: system-ui, sans-serif;
+                background: var(--bg-page);
+                color: var(--text-ui);
+                margin: 0; display: grid; place-items: center; min-height: 100vh;
+                font-size: clamp(0.75rem, 0.7rem + 0.25vw, 0.95rem);
+                line-height: 1.6;
+            }
+            @keyframes rotate-thought { to { --angle: 360deg; } }
+        }
+
+        @layer componentes {
+            .thought-effect {
+                position: relative; padding: 0.35em; border-radius: 1.2em;
+                overflow: hidden; display: grid; place-items: center;
+            }
+            .thought-effect::before {
+                content: ''; position: absolute; inset: 0;
+                background: conic-gradient(from var(--angle), transparent 50%, oklch(0.8 0.25 30), oklch(0.7 0.25 150), oklch(0.6 0.25 280), transparent 100%);
+                opacity: 0; transition: opacity 0.3s;
+            }
+            .thought-effect:hover::before {
+                opacity: 1; animation: rotate-thought 1.5s linear infinite;
+            }
+
+            .btn-ui {
+                all: unset; position: relative;
+                padding: 0.8em 2.2em; font-weight: 900; cursor: pointer;
+                border-radius: 0.7em; background: var(--btn-color); color: var(--btn-text);              
+                box-shadow: 0 0.6em 0 var(--btn-shadow);           
+                transform: translateY(-0.2em);
+                transition: transform 0.1s, box-shadow 0.1s;
+                font-size: 1.05em;
+            }
+            .btn-ui:active { transform: translateY(0); box-shadow: 0 0.1em 0 var(--btn-shadow); }
+
+            .modal-design {
+                border: none; border-radius: 2.2em; background: var(--bg-modal);
+                color: var(--text-ui); padding: 3.2em; 
+                width: 85vw; max-width: 42ch;
+                box-shadow: 0 2em 5rem oklch(0 0 0 / 0.12);
+                backdrop-filter: blur(2.5em);
+            }
+            .modal-design::backdrop { background: oklch(0 0 0 / 0.08); }
+
+            .close-wrapper { position: absolute; inset-block-start: 1.1em; inset-inline-end: 1.1em; }
+            .modal-close { background: none; border: none; cursor: pointer; padding: 0; position: relative; }
+            .modal-close svg { width: 2.5em; height: 2.5em; } 
+            .modal-close svg rect { fill: var(--close-bg); transition: fill 0.3s; }
+            .modal-close svg path { fill: var(--close-icon); transition: fill 0.3s; }
+            .modal-close:hover { --close-bg: oklch(1 0 0); --close-icon: var(--brand-color); }
+
+            .skip-container { position: absolute; inset-block-start: -15rem; inset-inline-start: 2rem; transition: inset-block-start 0.3s; }
+            .skip-container:focus-within { inset-block-start: 2rch; }
+
+            h2 { margin-block-start: 0; color: var(--title-modal); font-size: 2em; line-height: 1.1; }
+        }
+/* "El código más rápido es el que no tiene que descargarse" | «Accessibility by Default» 🥷 */
+    </style>
+</head>
+<body>
+    <nav class="skip-container thought-effect" aria-label="Navegación rápida">
+        <a href="#main" class="btn-ui">Ir al contenido</a>
+    </nav>
+    <main id="main">
+        <section class="thought-effect">
+            <button class="btn-ui" onclick="modal.showModal()" aria-haspopup="dialog" aria-label="Abrir información Baseline">¡Hola Baseline!</button>
+        </section>
+    </main>
+    <dialog id="modal" class="modal-design" aria-labelledby="modal-title">
+        <header class="close-wrapper thought-effect">
+            <form method="dialog">
+                <button class="modal-close" aria-label="Cerrar ventana">
+                    <svg viewBox="0 0 44 44">
+                        <rect width="44" height="44" rx="10"/>
+                        <path d="M30.1,30.3h-3.9c-0.3,0-0.5-0.1-0.6-0.2c-0.2-0.1-0.3-0.3-0.4-0.4l-3.4-5.9c-0.1,0.2-0.1,0.3-0.2,0.4l-3.1,5.4c-0.1,0.2-0.2,0.3-0.4,0.4c-0.1,0.1-0.3,0.2-0.6,0.2h-3.6l5.4-8.6l-5.2-8.1H18c0.3,0,0.4,0,0.6,0.1c0.1,0.1,0.2,0.2,0.3,0.3l3.3,5.6c0-0.1,0.1-0.2,0.1-0.3c0-0.1,0.1-0.2,0.2-0.3l2.9-5c0.1-0.2,0.2-0.3,0.3-0.4s0.3-0.1,0.4-0.1h3.7l-5.3,8L30.1,30.3z"/>
+                    </svg>
+                </button>
+            </form>
+        </header>
+        <h2 id="modal-title">¡El futuro es hoy!</h2>
+        <article>
+            <p><strong>¡Hola!</strong> Está creado en CSS Baseline 2026 Mayo.</p>
+            <p><strong>Al no usar JS</strong> y ser CSS MODERNO el botón vuela y no pesa la estructura!</p>
+            <p><strong>Lleva de serie</strong> Skip link y para Pantallas oscuras (famoso "ex" parche Dark-mode).</p>
+            <p><strong>Este ejemplo</strong> si te puede servir para implementarlo, por curiosidad o lo que mejor consideres, solo tienes que darle a ver el código fuente, copiarlo y usarlo. (Peso. 7KB - Navegador. 120fps)</p> 
+            <p>Que lo disfrutes, I LL FR.</p>
+        </article>
+    </dialog>
+</body>
+</html>
