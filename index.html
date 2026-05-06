@@ -27,7 +27,8 @@
             }
           .u-dark-mode { --brand-color: oklch(10% 0.01 240); }
         }
-
+            @keyframes rotate-thought { to { --angle: 360deg; } }
+      
         @layer base {
             body {
                 font-family: system-ui, sans-serif;
@@ -37,7 +38,6 @@
                 font-size: clamp(0.75rem, 0.7rem + 0.25vw, 0.95rem);
                 line-height: 1.6;
             }
-            @keyframes rotate-thought { to { --angle: 360deg; } }
         }
 
         @layer componentes {
